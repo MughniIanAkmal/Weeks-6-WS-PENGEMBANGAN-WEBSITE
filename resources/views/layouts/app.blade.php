@@ -17,26 +17,40 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a>
-                    </li>
-                </ul>
+                @auth
+                    @if (in_array(auth()->user()->role, ['kasir', 'admin']))
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('cashier*') ? 'active fw-bold text-warning' : 'text-white' }}" href="{{ route('cashier.index') }}">
+                                    🛒 Mesin Kasir (POS)
+                                </a>
+                            </li>
+                        </ul>
+                    @endif
+                @endauth
 
                 <ul class="navbar-nav ms-auto align-items-center">
                     @auth
                         <li class="nav-item me-2">
-                            <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-secondary' }}">
-                                {{ auth()->user()->name }} ({{ strtoupper(auth()->user()->role) }})
-                            </span>
+                            <a href="{{ route('profile') }}" class="text-decoration-none">
+                                <span class="badge {{ auth()->user()->role === 'admin' ? 'bg-danger' : 'bg-primary' }} py-2 px-2">
+                                    {{ auth()->user()->name }} ({{ strtoupper(auth()->user()->role) }})
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a href="{{ route('profile') }}" class="btn btn-outline-light btn-sm">Profil</a>
                         </li>
                         <li class="nav-item">
                             <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Logout</button>
                             </form>
                         </li>
                     @else
+                        <li class="nav-item me-2">
+                            <a href="{{ route('register') }}" class="btn btn-outline-info btn-sm">Register</a>
+                        </li>
                         <li class="nav-item">
                             <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm px-3">Login</a>
                         </li>

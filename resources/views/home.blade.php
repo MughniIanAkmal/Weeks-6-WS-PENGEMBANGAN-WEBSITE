@@ -13,8 +13,21 @@
                     {{ auth()->user()->name }} (ADMIN)
                 </span>
                 <span class="badge bg-success-subtle text-success border border-success-subtle small">
-                    Bisa CRUD (Tambah, Edit, Hapus)
+                    Akses CRUD & Kasir Aktif
                 </span>
+                <a href="{{ route('cashier.index') }}" class="btn btn-primary btn-sm py-0 ms-auto">
+                    🛒 Buka Mesin Kasir (POS)
+                </a>
+            @elseif (auth()->user()->role === 'kasir')
+                <span class="badge bg-info text-dark">
+                    {{ auth()->user()->name }} (KASIR)
+                </span>
+                <span class="badge bg-info-subtle text-dark border border-info-subtle small">
+                    Akses Transaksi Penjualan & Cetak Struk
+                </span>
+                <a href="{{ route('cashier.index') }}" class="btn btn-primary btn-sm py-0 ms-auto">
+                    🛒 Buka Mesin Kasir (POS)
+                </a>
             @else
                 <span class="badge bg-secondary">
                     {{ auth()->user()->name }} (USER BIASA)
@@ -69,16 +82,16 @@
             <span class="text-muted small ms-2">(Total: {{ $stats['total_products'] }} produk)</span>
         </div>
         <div>
-            {{-- Tombol Tambah Produk hanya untuk ADMIN --}}
-            @if (auth()->check() && auth()->user()->role === 'admin')
+            {{-- Tombol Tambah Produk menggunakan Directive @can (Acara 24 Authorization) --}}
+            @can('create', App\Models\Product::class)
                 <a href="{{ route('product.create') }}" class="btn btn-success btn-sm py-1">
-                    + Tambah Produk (Admin)
+                    + Tambah Produk
                 </a>
             @else
                 <button class="btn btn-secondary btn-sm py-1 disabled" title="Hanya Admin yang dapat menambah produk">
                     + Tambah Produk (Terkunci)
                 </button>
-            @endif
+            @endcan
         </div>
     </div>
 
@@ -113,11 +126,11 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            {{-- Pengecekan Hak Akses: HANYA ADMIN YANG BISA EDIT & HAPUS --}}
-                            @if (auth()->check() && auth()->user()->role === 'admin')
+                            {{-- Pengecekan Hak Akses menggunakan Policy @can('update', $p) (Acara 24) --}}
+                            @can('update', $p)
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ route('product.edit', $p->id) }}" class="btn btn-outline-warning py-0 px-2" title="Edit Data">
-                                        Edit
+                                         Edit
                                     </a>
                                     <form action="{{ route('product.destroy', $p->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus produk {{ $p->name }}?');">
                                         @csrf
@@ -131,7 +144,7 @@
                                 <span class="badge bg-light text-muted border small" title="User biasa tidak memiliki hak akses CRUD">
                                     Hanya Lihat
                                 </span>
-                            @endif
+                            @endcan
                         </td>
                     </tr>
                 @empty

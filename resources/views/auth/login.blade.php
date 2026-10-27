@@ -33,14 +33,33 @@
                 <button type="submit" class="btn btn-primary w-100 fw-semibold mb-3">
                     Login
                 </button>
+                <div class="text-center mb-3">
+                    <span class="text-muted small">Belum punya akun?</span>
+                    <a href="{{ route('register') }}" class="small fw-semibold">Daftar Akun Baru</a>
+                </div>
             </form>
 
-            <div class="border-top pt-3 text-muted small">
-                <div class="fw-semibold mb-1">Akun Tersedia untuk Pengujian:</div>
-                <ul class="mb-0 ps-3">
-                    <li><strong>Admin (Bisa CRUD):</strong> <code>admin@postoko.com</code> / <code>password123</code></li>
-                    <li><strong>User Biasa (Hanya Lihat):</strong> <code>johndoe@example.com</code> / <code>password123</code></li>
-                </ul>
+            <div class="border-top pt-3">
+                <div class="fw-semibold small mb-2 text-dark">Quick Login Pengujian Praktikum:</div>
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                    <a href="{{ route('quickLogin', 'admin') }}" class="btn btn-outline-danger btn-sm">
+                        Admin
+                    </a>
+                    <a href="{{ route('quickLogin', 'kasir') }}" class="btn btn-outline-info btn-sm">
+                        Kasir
+                    </a>
+                    <a href="{{ route('quickLogin', 'user') }}" class="btn btn-outline-secondary btn-sm">
+                        User Biasa
+                    </a>
+                </div>
+                <div class="text-muted small">
+                    <div class="fw-semibold mb-1">Kredensial Manual:</div>
+                    <ul class="mb-0 ps-3">
+                        <li><code>admin@postoko.com</code> / <code>password123</code> (Admin)</li>
+                        <li><code>kasir1@postoko.com</code> / <code>password123</code> (Kasir)</li>
+                        <li><code>johndoe@example.com</code> / <code>password123</code> (User)</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

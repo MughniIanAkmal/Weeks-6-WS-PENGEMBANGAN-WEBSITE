@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
@@ -19,11 +20,11 @@ class ProductController extends Controller
     }
 
     /**
-     * Menampilkan form tambah produk (create) - HANYA ADMIN.
+     * Menampilkan form tambah produk (create) - HANYA ADMIN (Otorisasi Gate/Policy Acara 24).
      */
     public function create()
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (Gate::denies('manage-products') || Gate::denies('create', Product::class)) {
             return redirect()->route('home')->with('error', 'Akses ditolak! User biasa tidak memiliki izin untuk menambah data (Hanya Admin).');
         }
 
@@ -32,11 +33,11 @@ class ProductController extends Controller
     }
 
     /**
-     * Menyimpan produk baru ke database (store) - HANYA ADMIN.
+     * Menyimpan produk baru ke database (store) - HANYA ADMIN (Otorisasi Policy Acara 24).
      */
     public function store(Request $request)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (Gate::denies('create', Product::class)) {
             return redirect()->route('home')->with('error', 'Akses ditolak! User biasa tidak memiliki izin untuk menambah data (Hanya Admin).');
         }
 
@@ -51,7 +52,7 @@ class ProductController extends Controller
         Product::create($request->only(['category_id', 'name', 'sku', 'price', 'stock']));
 
         return redirect()->route('home')
-            ->with('success', 'Produk baru berhasil ditambahkan melalui ProductController::store()!');
+            ->with('success', 'Produk baru berhasil ditambahkan melalui ProductController::store() (Divalidasi oleh ProductPolicy)!');
     }
 
     /**
@@ -64,25 +65,26 @@ class ProductController extends Controller
     }
 
     /**
-     * Menampilkan form edit produk (edit) - HANYA ADMIN.
+     * Menampilkan form edit produk (edit) - HANYA ADMIN (Otorisasi Gate/Policy Acara 24).
      */
-    public function edit($id)
+    public function edit(Product $product)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (Gate::denies('update', $product)) {
             return redirect()->route('home')->with('error', 'Akses ditolak! User biasa tidak memiliki izin untuk mengedit data (Hanya Admin).');
         }
 
-        $product = Product::findOrFail($id);
         $categories = Category::orderBy('name')->get();
         return view('products.edit', compact('product', 'categories'));
     }
 
     /**
-     * Memperbarui produk di database (update) - HANYA ADMIN.
+     * Memperbarui produk di database (update) - HANYA ADMIN (Otorisasi Policy Acara 24).
      */
     public function update(Request $request, $id)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        $product = Product::findOrFail($id);
+
+        if (Gate::denies('update', $product)) {
             return redirect()->route('home')->with('error', 'Akses ditolak! User biasa tidak memiliki izin untuk memperbarui data (Hanya Admin).');
         }
 
@@ -94,23 +96,23 @@ class ProductController extends Controller
             'stock'       => 'required|integer|min:0',
         ]);
 
-        $product = Product::findOrFail($id);
         $product->update($request->only(['category_id', 'name', 'sku', 'price', 'stock']));
 
         return redirect()->route('home')
-            ->with('success', "Produk [ID: {$id}] berhasil diperbarui melalui ProductController::update()!");
+            ->with('success', "Produk [ID: {$id}] berhasil diperbarui melalui ProductController::update() (Disahkan oleh ProductPolicy)!");
     }
 
     /**
-     * Menghapus produk dari database (destroy) - HANYA ADMIN.
+     * Menghapus produk dari database (destroy) - HANYA ADMIN (Otorisasi Policy Acara 24).
      */
     public function destroy($id)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        $product = Product::findOrFail($id);
+
+        if (Gate::denies('delete', $product)) {
             return redirect()->route('home')->with('error', 'Akses ditolak! User biasa tidak memiliki izin untuk menghapus data (Hanya Admin).');
         }
 
-        $product = Product::findOrFail($id);
         $product->delete();
 
         return redirect()->route('home')
