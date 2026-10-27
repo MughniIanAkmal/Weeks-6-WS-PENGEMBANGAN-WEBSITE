@@ -415,4 +415,27 @@ class CashierController extends Controller
 
         return view('cashier.history', compact('transactions'));
     }
+
+    /**
+     * Kirim Struk Transaksi ke Email Pelanggan (Integrasi Acara 32 - Laravel Email).
+     */
+    public function sendReceiptEmail(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Email pelanggan wajib diisi.',
+            'email.email'    => 'Format alamat email tidak valid.',
+        ]);
+
+        $transaction = Transaction::with(['items', 'user'])->findOrFail($id);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\TransactionReceiptMail($transaction));
+
+            return redirect()->back()->with('success', "Struk transaksi #{$transaction->invoice_number} berhasil dikirimkan ke {$request->email}!");
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', "Gagal mengirimkan email: " . $e->getMessage());
+        }
+    }
 }

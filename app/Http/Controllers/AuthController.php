@@ -88,13 +88,22 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Kirim email sambutan pendaftaran user baru (Integrasi Acara 32 - Laravel Email)
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeUserMail($user));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal mengirim email welcome: " . $e->getMessage());
+        }
+
         // Kirim email notifikasi verifikasi jika diperlukan
-        $user->sendEmailVerificationNotification();
+        if (method_exists($user, 'sendEmailVerificationNotification')) {
+            $user->sendEmailVerificationNotification();
+        }
 
         // Login otomatis pengguna yang baru mendaftar
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', "Registrasi berhasil! Selamat datang, {$user->name} ({$user->role}).");
+        return redirect()->route('home')->with('success', "Registrasi berhasil! Selamat datang, {$user->name} (" . strtoupper($user->role) . "). Email konfirmasi telah dikirimkan.");
     }
 
     /**

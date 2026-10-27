@@ -74,10 +74,13 @@
             <span class="badge bg-success px-2 py-1">✓ Transaksi Sukses</span>
             <span class="small text-muted">{{ $transaction->invoice_number }}</span>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <button type="button" class="btn btn-primary fw-bold flex-grow-1 py-2" onclick="triggerPrint()">
-                🖨️ Cetak Struk (Print)
+                <i class="bi bi-printer"></i> Cetak Struk (Thermal)
             </button>
+            <a href="{{ route('reports.receipt.pdf', $transaction->id) }}" target="_blank" class="btn btn-outline-danger py-2 fw-semibold">
+                <i class="bi bi-file-earmark-pdf"></i> PDF
+            </a>
             <a href="{{ route('cashier.index') }}" class="btn btn-outline-secondary fw-semibold">
                 + Kasir Baru
             </a>
@@ -85,8 +88,23 @@
                 Riwayat
             </a>
         </div>
+
+        <!-- Form Kirim Struk ke Email Pelanggan (Integrasi Acara 32) -->
+        <form action="{{ route('cashier.receipt.email', $transaction->id) }}" method="POST" class="mt-3 pt-3 border-top">
+            @csrf
+            <label class="form-label small fw-bold text-muted mb-1 d-flex align-items-center">
+                <i class="bi bi-envelope-at text-primary me-1"></i> Kirim Struk Digital ke Email Pelanggan:
+            </label>
+            <div class="input-group input-group-sm">
+                <input type="email" name="email" class="form-control" placeholder="contoh: pelanggan@gmail.com" required>
+                <button type="submit" class="btn btn-primary fw-semibold">
+                    <i class="bi bi-send me-1"></i> Kirim Email
+                </button>
+            </div>
+        </form>
+
         <div class="text-center mt-2">
-            <small class="text-muted">Dialog cetak muncul otomatis. Jika tidak muncul, klik tombol biru di atas atau tekan <strong>Ctrl + P</strong>.</small>
+            <small class="text-muted">Dialog cetak thermal muncul otomatis. Anda juga dapat mengunduh PDF atau mengirim struk langsung ke email pembeli.</small>
         </div>
     </div>
 

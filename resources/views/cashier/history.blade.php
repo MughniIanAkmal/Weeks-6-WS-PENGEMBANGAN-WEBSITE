@@ -9,6 +9,9 @@
         <small class="text-muted">Daftar rekapan transaksi penjualan dan cetak ulang struk</small>
     </div>
     <div class="d-flex gap-2">
+        <a href="{{ route('reports.transactions.pdf') }}" target="_blank" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Unduh Laporan PDF
+        </a>
         <a href="{{ route('cashier.index') }}" class="btn btn-primary btn-sm">
             + Buka Mesin Kasir (POS)
         </a>
@@ -30,7 +33,7 @@
                     <th>Pelanggan</th>
                     <th class="text-center">Total Belanja</th>
                     <th class="text-center">Metode</th>
-                    <th class="text-center" style="width: 140px;">Aksi</th>
+                    <th class="text-center" style="width: 160px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,9 +57,14 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('cashier.receipt', $trx->id) }}" class="btn btn-outline-primary btn-sm py-0 px-2">
-                                Cetak Struk
-                            </a>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ route('cashier.receipt', $trx->id) }}" class="btn btn-outline-primary py-0 px-2" title="Cetak Struk Thermal">
+                                    <i class="bi bi-receipt"></i> Struk
+                                </a>
+                                <a href="{{ route('reports.receipt.pdf', $trx->id) }}" target="_blank" class="btn btn-outline-danger py-0 px-2" title="Unduh PDF Resmi">
+                                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 @empty
